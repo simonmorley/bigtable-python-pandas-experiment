@@ -12,18 +12,19 @@ def main(project_id, instance_id, table_id):
     client = bigtable.Client(project=project_id, admin=True)
     instance = client.instance(instance_id)
     table = instance.table(table_id)
-    column_family_id = 'STATIONS'
-    column_id = 'TX_PACKETS'.encode('utf-8')
+    column_family_id = 'ST'
+    column_id = 'TX_BYTES'.encode('utf-8')
 
     print('Getting a single greeting by row key.')
 
     # [START scanning_all_rows]
     print('Scanning for all greetings:')
 
-    col1_filter = ColumnQualifierRegexFilter(b'TX_PACKETS')
+    col1_filter = ColumnQualifierRegexFilter(b'TX_BYTES:*')
     chain1 = RowFilterChain(filters=[col1_filter])
 
     partial_rows = table.read_rows(filter_=col1_filter)
+    # partial_rows = table.read_rows(filter_=col1_filter)
     partial_rows.consume_all()
 
     a = []
@@ -34,6 +35,9 @@ def main(project_id, instance_id, table_id):
         value = cell.value.decode('utf-8')
         val = { "Date": cell.timestamp.strftime("%a, %d %b %Y %H:%M:%S"), "Value": float(value) }
         a.append(val)
+
+
+    print(a)
 
     incomplete_data = json_to_dataframe(a)
 
@@ -53,7 +57,8 @@ def main(project_id, instance_id, table_id):
     interpolated.plot(kind="line")
     # axis.set_ylim(18,22)
 
-    a = interpolated.reset_index().to_json(orient='records')
+    # a = interpolated.reset_index().to_json(orient='records')
+    a = interpolated.to_json(orient='records')
 
     print(a)
 
