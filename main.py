@@ -10,6 +10,7 @@ from google.cloud.bigtable.row_filters import ColumnQualifierRegexFilter
 from google.cloud.bigtable.row_filters import RowFilterChain
 from google.cloud.bigtable.row_filters import ValueRangeFilter
 from google.cloud.bigtable.row_filters import ValueRegexFilter
+from google.cloud.bigtable.row_filters import RowKeyRegexFilter
 
 from pandas.io.json import json_normalize
 from matplotlib import pyplot
@@ -19,6 +20,29 @@ def main(project_id, instance_id, table_id):
     instance = client.instance(instance_id)
     table = instance.table(table_id)
     column_family_id = 'ST'
+
+    a = []
+
+    col1_filter = RowKeyRegexFilter(b'6852#88DC961302E8#201703')
+    col2_filter = ValueRegexFilter('11820581')
+    # col3_filter = ValueRangeFilter("0".encode('utf-8'), "1488784881000".encode('utf-8'))
+
+    chain1 = RowFilterChain(filters=[col1_filter, col2_filter])
+
+    partial_rows = table.read_rows(filter_=col1_filter)
+    partial_rows.consume_all()
+
+    for row_key, row in partial_rows.rows.items():
+        key = row_key.decode('utf-8')
+        cell = row.cells['UNQS_M'][0]
+        print(cell)
+
+        # cell = cell[cell.keys()[0]][0]
+        # value = cell.value.decode('utf-8')
+        # val = { "Date": cell.timestamp.strftime("%a, %d %b %Y %H:%M:%S"), "Value": float(value) }
+        # a.append(val)
+
+    return
 
     print('Scanning tables:')
 
