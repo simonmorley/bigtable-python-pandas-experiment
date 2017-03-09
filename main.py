@@ -4,6 +4,7 @@ import pandas as pd
 import struct
 import array
 import base64
+import sys
 
 from google.cloud import bigtable
 from google.cloud.bigtable.row_filters import ColumnQualifierRegexFilter
@@ -32,15 +33,38 @@ def main(project_id, instance_id, table_id):
     partial_rows = table.read_rows(filter_=col1_filter)
     partial_rows.consume_all()
 
+    uniques = set()
     for row_key, row in partial_rows.rows.items():
         key = row_key.decode('utf-8')
-        cell = row.cells['UNQS_M'][0]
-        print(cell)
+        print(key)
+        try:
+            cell = row.cells['UNQS']
+            for k in cell.keys():
+                uniques.add(k)
+            # for key, i in cell.keys():
+            #     print(key, i)
+                # a.append(key)
+            cell = cell[cell.keys()[0]]
+
+        except:
+            e = sys.exc_info()[0]
+            print(e)
+
+        # else:
+            # print(cell)
+            # for x, y in cell:
+            #     print(123, x.value, y)
+            # value = cell.value.decode('utf-8')
+            # val = { "Date": cell.timestamp.strftime("%a, %d %b %Y %H:%M:%S"), "Value": float(value) }
+            # val = 123
+            # a.append(val)
 
         # cell = cell[cell.keys()[0]][0]
         # value = cell.value.decode('utf-8')
         # val = { "Date": cell.timestamp.strftime("%a, %d %b %Y %H:%M:%S"), "Value": float(value) }
-        # a.append(val)
+
+
+    print(len(uniques))
 
     return
 
