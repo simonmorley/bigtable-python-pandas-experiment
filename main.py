@@ -64,7 +64,7 @@ def main(project_id, instance_id, table_id):
         # val = { "Date": cell.timestamp.strftime("%a, %d %b %Y %H:%M:%S"), "Value": float(value) }
 
 
-    print(len(uniques))
+    print("Hey, there are %d uniques online today!" % len(uniques))
 
     return
 
